@@ -13,65 +13,30 @@
 
   let isLyricsMode = $state(false);
 
-  // Dynamic card dimensions for smooth, organic morphing animation
-  let cardWidth = $state(430);
-  let cardHeight = $state(320);
-  let currentWindowH = 335;
-  const WINDOW_W = 480;
-
-  let shrinkTimer: any = null;
-
   function getTargetDimensions(tab: 'music' | 'controls', lyrics: boolean) {
     if (tab === 'controls') {
-      return { w: 430, h: 320, winH: 335 };
+      return { w: 430, h: 320 };
     } else {
       if (lyrics) {
-        return { w: 465, h: 360, winH: 375 };
+        return { w: 465, h: 360 };
       } else {
-        return { w: 385, h: 215, winH: 230 };
+        return { w: 385, h: 215 };
       }
     }
   }
 
-  function applyMorph(tab: 'music' | 'controls', lyrics: boolean, immediate = false) {
-    const { w, h, winH } = getTargetDimensions(tab, lyrics);
+  // Initialize dimensions matching the initial tab immediately (no mount jump)
+  const initialDims = getTargetDimensions(
+    systemStore.media?.status === 'Playing' ? 'music' : 'controls',
+    false
+  );
+  let cardWidth = $state(initialDims.w);
+  let cardHeight = $state(initialDims.h);
 
-    if (shrinkTimer) {
-      clearTimeout(shrinkTimer);
-      shrinkTimer = null;
-    }
-
-    if (immediate) {
-      cardWidth = w;
-      cardHeight = h;
-      currentWindowH = winH;
-      tauriBridge.resizeIsland('expanded', WINDOW_W, winH);
-      return;
-    }
-
-    const isGrowing = winH > currentWindowH || w > cardWidth;
-
-    if (isGrowing) {
-      // 1. Expand X11/Tauri window first so animation isn't clipped
-      currentWindowH = winH;
-      tauriBridge.resizeIsland('expanded', WINDOW_W, winH);
-
-      // 2. Animate CSS card outward smoothly
-      requestAnimationFrame(() => {
-        cardWidth = w;
-        cardHeight = h;
-      });
-    } else {
-      // 1. Animate CSS card inward smoothly (Tauri window remains large enough)
-      cardWidth = w;
-      cardHeight = h;
-
-      // 2. Shrink X11/Tauri window AFTER visual transition completes (520ms)
-      shrinkTimer = setTimeout(() => {
-        currentWindowH = winH;
-        tauriBridge.resizeIsland('expanded', WINDOW_W, winH);
-      }, 520);
-    }
+  function applyMorph(tab: 'music' | 'controls', lyrics: boolean) {
+    const { w, h } = getTargetDimensions(tab, lyrics);
+    cardWidth = w;
+    cardHeight = h;
   }
 
   function handleSelectTab(tab: 'music' | 'controls') {
@@ -92,14 +57,8 @@
     }
   }
 
-  onMount(() => {
-    // Initial size based on active tab
-    applyMorph(currentTab, isLyricsMode, true);
-  });
-
   function handleClose(e: MouseEvent) {
     e.stopPropagation();
-    if (shrinkTimer) clearTimeout(shrinkTimer);
     islandState.collapse();
   }
 </script>
@@ -134,13 +93,13 @@
     </div>
 
     <div class="header-right">
-      <button class="close-btn" onclick={handleClose} title="Collapse (Esc)">
-        <X size={15} color="#565f89" />
+      <button class="close-btn" onclick={handleClose} title="Tutup Card">
+        <X size={13} color="#94a3b8" />
       </button>
     </div>
   </div>
 
-  <!-- Content Body Stack: Keeps state intact and provides silky-smooth cross-fade & morphing -->
+  <!-- Content Stack: Smooth crossfade transitions -->
   <div class="card-content-stack">
     <div
       class="tab-pane"
@@ -175,9 +134,9 @@
     padding: 10px 14px;
     margin: 0 auto;
     overflow: hidden;
-    transition: width 0.52s cubic-bezier(0.34, 1.25, 0.4, 1),
-                height 0.52s cubic-bezier(0.34, 1.25, 0.4, 1);
-    animation: expandSpring 0.35s cubic-bezier(0.34, 1.32, 0.5, 1);
+    /* Ultra-smooth Apple-style fluid easing with NO overshoot/vibration */
+    transition: width 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .card-header {
@@ -274,35 +233,21 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.48s cubic-bezier(0.34, 1.25, 0.4, 1),
-                filter 0.38s ease;
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .tab-pane.active {
     opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0px);
+    transform: translateY(0);
     pointer-events: auto;
     z-index: 2;
   }
 
   .tab-pane.inactive {
     opacity: 0;
-    transform: translateY(8px) scale(0.96);
-    filter: blur(4px);
+    transform: translateY(6px);
     pointer-events: none;
     z-index: 1;
-  }
-
-  @keyframes expandSpring {
-    0% {
-      opacity: 0.6;
-      transform: scale(0.96) translateY(-8px);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-    }
   }
 </style>

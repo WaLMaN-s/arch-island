@@ -11,18 +11,12 @@ pub fn apply_skip_taskbar() {
     }
 }
 
-/// Spawns a background thread that periodically re-applies the skip_taskbar
-/// property during startup and window initialization.
+/// Spawns a background thread that applies the skip_taskbar property
+/// periodically during initial startup (giving WebKitGTK & i3wm time to map the window).
 pub fn start_x11_enforcer() {
     std::thread::spawn(move || {
-        // Run checks frequently during the first 10 seconds of startup
-        for _ in 0..40 {
-            std::thread::sleep(std::time::Duration::from_millis(250));
-            apply_skip_taskbar();
-        }
-        // Then keep checking every 5 seconds as an ongoing safeguard
-        loop {
-            std::thread::sleep(std::time::Duration::from_secs(5));
+        for delay_ms in [500, 1000, 2000, 3500, 6000] {
+            std::thread::sleep(std::time::Duration::from_millis(delay_ms));
             apply_skip_taskbar();
         }
     });

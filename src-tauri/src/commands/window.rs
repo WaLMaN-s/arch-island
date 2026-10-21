@@ -6,7 +6,7 @@ pub fn resize_island(window: Window, mode: String, custom_width: Option<f64>, cu
         (w, h)
     } else {
         match mode.as_str() {
-            "expanded" => (480.0, 310.0),
+            "expanded" => (480.0, 385.0),
             "compact" => (330.0, 32.0),
             "tucked" => (180.0, 4.0),
             _ => (180.0, 4.0),
@@ -30,8 +30,6 @@ pub fn resize_island(window: Window, mode: String, custom_width: Option<f64>, cu
     let _ = std::process::Command::new("i3-msg")
         .arg(&i3_cmd)
         .spawn();
-
-    crate::services::x11::apply_skip_taskbar();
 
     Ok(())
 }
