@@ -31,6 +31,8 @@ pub fn resize_island(window: Window, mode: String, custom_width: Option<f64>, cu
         .arg(&i3_cmd)
         .spawn();
 
+    crate::services::x11::apply_skip_taskbar();
+
     Ok(())
 }
 

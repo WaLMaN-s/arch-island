@@ -26,6 +26,10 @@ pub fn run() {
                 let _ = window.set_size(Size::Logical(LogicalSize { width, height }));
                 let _ = window.set_position(Position::Logical(LogicalPosition { x, y }));
                 let _ = window.set_always_on_top(true);
+                let _ = window.set_skip_taskbar(true);
+
+                // Start X11 taskbar/pager exclusion enforcer
+                services::x11::start_x11_enforcer();
 
                 let i3_cmd = format!(
                     "[instance=\"arch-island\"] floating enable, border pixel 0, sticky enable, resize set {} {}, move position {} {}",

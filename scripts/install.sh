@@ -56,6 +56,7 @@ Icon=utilities-system-monitor
 Terminal=false
 Type=Application
 Categories=Utility;System;
+NoDisplay=true
 EOF
 
 chmod +x "$HOME/.local/share/applications/arch-island.desktop"

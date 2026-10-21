@@ -7,5 +7,6 @@ pub mod network;
 pub mod notifications;
 pub mod system_stats;
 pub mod system_toggles;
+pub mod x11;
 
 
