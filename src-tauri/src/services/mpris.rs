@@ -37,28 +37,64 @@ pub fn get_media_state() -> Option<MediaState> {
         .unwrap_or_else(|_| "Unknown".to_string());
 
     // Query title
-    let title = Command::new("playerctl")
-        .args(["metadata", "--format", "{{markup_escape(title)}}"])
+    let mut title = Command::new("playerctl")
+        .args(["metadata", "--format", "{{title}}"])
         .output()
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+        .map(|o| clean_meta(&String::from_utf8_lossy(&o.stdout)))
         .unwrap_or_default();
+
+    if title.is_empty() {
+        // Fallback: extract filename from xesam:url
+        let url = Command::new("playerctl")
+            .args(["metadata", "--format", "{{xesam:url}}"])
+            .output()
+            .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+            .unwrap_or_default();
+
+        if !url.is_empty() {
+            if let Some(filename) = url.split('/').last() {
+                let decoded = percent_decode(filename);
+                title = clean_meta(&decoded);
+            }
+        }
+    }
+
+    let extensions = [".mp3", ".flac", ".wav", ".m4a", ".aac", ".ogg", ".opus", ".wma"];
+    for ext in extensions {
+        if title.to_lowercase().ends_with(ext) {
+            title = title[..title.len() - ext.len()].trim().to_string();
+        }
+    }
 
     if title.is_empty() {
         return None;
     }
 
     // Query artist
-    let artist = Command::new("playerctl")
-        .args(["metadata", "--format", "{{markup_escape(artist)}}"])
+    let mut artist = Command::new("playerctl")
+        .args(["metadata", "--format", "{{artist}}"])
         .output()
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+        .map(|o| clean_meta(&String::from_utf8_lossy(&o.stdout)))
         .unwrap_or_default();
+
+    // If artist is empty but title has "Artist - Song", split them
+    if artist.is_empty() && title.contains(" - ") {
+        let parts: Vec<&str> = title.splitn(2, " - ").collect();
+        if parts.len() == 2 && !parts[0].trim().is_empty() {
+            artist = parts[0].trim().to_string();
+            title = parts[1].trim().to_string();
+        }
+    }
+
+    if artist.is_empty() {
+        artist = "USB / Local Audio".to_string();
+    }
 
     // Query album
     let album = Command::new("playerctl")
-        .args(["metadata", "--format", "{{markup_escape(album)}}"])
+        .args(["metadata", "--format", "{{album}}"])
         .output()
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+        .map(|o| clean_meta(&String::from_utf8_lossy(&o.stdout)))
         .unwrap_or_default();
 
     // Query art url
@@ -135,4 +171,37 @@ pub fn seek(offset_sec: f64) -> Result<(), String> {
         .spawn()
         .map_err(|e| e.to_string())?;
     Ok(())
+}
+
+fn percent_decode(input: &str) -> String {
+    let mut result = String::new();
+    let bytes = input.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'%' && i + 2 < bytes.len() {
+            if let Ok(byte) = u8::from_str_radix(&input[i + 1..i + 3], 16) {
+                result.push(byte as char);
+                i += 3;
+                continue;
+            }
+        } else if bytes[i] == b'+' {
+            result.push(' ');
+            i += 1;
+            continue;
+        }
+        result.push(bytes[i] as char);
+        i += 1;
+    }
+    result
+}
+
+fn clean_meta(s: &str) -> String {
+    s.replace("&apos;", "'")
+        .replace("&#39;", "'")
+        .replace("&quot;", "\"")
+        .replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .trim()
+        .to_string()
 }
