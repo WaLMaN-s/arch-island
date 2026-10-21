@@ -109,7 +109,7 @@ Jika di kemudian hari Anda ingin mengubah kode atau menambah fitur baru:
 
 ```bash
 # Masuk ke direktori project
-cd /home/man/WEB/arch-iland
+cd /home/man/WEB/arch-island
 
 # Mode pengembangan (live reload):
 npm run dev
