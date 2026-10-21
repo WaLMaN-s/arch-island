@@ -1,0 +1,28 @@
+:root {
+  --bg-primary: #000000;
+  --bg-secondary: #16161e;
+  --primary: #7aa2f7;
+  --secondary: #bb9af7;
+  --text: #c0caf5;
+  --muted: #565f89;
+  --font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  color: var(--text);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  user-select: none;
+}
