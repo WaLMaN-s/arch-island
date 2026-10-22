@@ -4,10 +4,20 @@
   import { systemStore } from '$lib/stores/systemStore.svelte';
   import CompactIsland from '$lib/components/CompactIsland.svelte';
   import ExpandedIsland from '$lib/components/ExpandedIsland.svelte';
+  import { listen } from '@tauri-apps/api/event';
 
   onMount(() => {
     systemStore.init();
     islandState.init();
+
+    let unlistenClose: (() => void) | undefined;
+    listen('close-requested', () => {
+      if (islandState.mode === 'expanded') {
+        islandState.collapse();
+      }
+    }).then((fn) => {
+      unlistenClose = fn;
+    });
 
     const handleKeydown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && islandState.mode === 'expanded') {
@@ -25,6 +35,7 @@
     document.addEventListener('mouseleave', handleWindowLeave);
 
     return () => {
+      unlistenClose?.();
       window.removeEventListener('keydown', handleKeydown);
       window.removeEventListener('mouseleave', handleWindowLeave);
       document.removeEventListener('mouseleave', handleWindowLeave);

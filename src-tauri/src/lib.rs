@@ -44,6 +44,12 @@ pub fn run() {
 
             Ok(())
         })
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                api.prevent_close();
+                let _ = tauri::Emitter::emit(window, "close-requested", ());
+            }
+        })
         .invoke_handler(tauri::generate_handler![
             commands::window::resize_island,
             commands::media::get_media_state,
