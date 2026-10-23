@@ -48,6 +48,8 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <main
   class="island-root"
   class:mode-tucked={islandState.mode === 'tucked'}
@@ -60,16 +62,33 @@
     systemStore.setPollingRate(5000);
     islandState.onMouseLeave();
   }}
+  onclick={(e) => {
+    if (e.target === e.currentTarget && islandState.mode === 'expanded' && !islandState.isLyricsOpen) {
+      islandState.collapse();
+    }
+  }}
 >
   {#if islandState.mode === 'tucked'}
     <!-- Ultra-slim notch lip at screen top edge (doesn't obstruct screen clicks) -->
-    <div class="tuck-indicator"></div>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="tuck-indicator" onclick={() => islandState.onMouseEnter()}></div>
   {:else if islandState.mode === 'compact'}
     <div class="notch-spring-wrapper" class:retracting={islandState.isRetracting}>
       <CompactIsland />
     </div>
   {:else}
-    <div class="expanded-wrapper">
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <div
+      class="expanded-wrapper"
+      class:retracting={islandState.isRetracting}
+      onclick={(e) => {
+        if (e.target === e.currentTarget && islandState.mode === 'expanded' && !islandState.isLyricsOpen) {
+          islandState.collapse();
+        }
+      }}
+    >
       <ExpandedIsland />
     </div>
   {/if}
@@ -156,6 +175,10 @@
     animation: expandFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
+  .expanded-wrapper.retracting {
+    animation: collapseFade 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
   @keyframes expandFade {
     0% {
       opacity: 0.6;
@@ -164,6 +187,17 @@
     100% {
       opacity: 1;
       transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes collapseFade {
+    0% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.96) translateY(-12px);
     }
   }
 </style>

@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import { systemStore } from '$lib/stores/systemStore.svelte';
+  import { islandState } from '$lib/stores/islandState.svelte';
   import { tauriBridge } from '$lib/services/tauriBridge';
   import type { WifiNetworkInfo } from '$lib/types';
   import {
@@ -41,6 +43,14 @@
   let showBluetoothModal = $state(false);
   let isConnectingBt = $state(false);
   let btError = $state<string | null>(null);
+
+  $effect(() => {
+    islandState.hasModalOpen = showWifiModal || showBluetoothModal;
+  });
+
+  onDestroy(() => {
+    islandState.hasModalOpen = false;
+  });
 
   async function openBluetoothModal() {
     showBluetoothModal = true;

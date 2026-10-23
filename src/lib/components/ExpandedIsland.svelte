@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { islandState } from '$lib/stores/islandState.svelte';
   import { systemStore } from '$lib/stores/systemStore.svelte';
   import { tauriBridge } from '$lib/services/tauriBridge';
@@ -47,11 +47,15 @@
       return;
     }
     currentTab = tab;
-    applyMorph(tab, isLyricsMode);
+    if (isLyricsMode) {
+      handleLyricsToggle(false);
+    }
+    applyMorph(tab, false);
   }
 
   function handleLyricsToggle(lyrics: boolean) {
     isLyricsMode = lyrics;
+    islandState.isLyricsOpen = lyrics;
     if (currentTab === 'music') {
       applyMorph('music', lyrics);
     }
@@ -59,13 +63,23 @@
 
   function handleClose(e: MouseEvent) {
     e.stopPropagation();
+    handleLyricsToggle(false);
     islandState.collapse();
   }
+
+  onDestroy(() => {
+    islandState.isLyricsOpen = false;
+  });
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
   class="expanded-card"
   style="width: {cardWidth}px; height: {cardHeight}px;"
+  onmouseenter={() => islandState.onMouseEnter()}
+  onmouseleave={() => islandState.onMouseLeave()}
+  onclick={(e) => e.stopPropagation()}
 >
   <!-- Header Bar -->
   <div class="card-header">

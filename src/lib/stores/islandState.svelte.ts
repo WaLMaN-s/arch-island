@@ -10,6 +10,8 @@ class IslandStateStore {
   hudValue = $state<number>(0);
   isHovered = $state(false);
   isRetracting = $state(false);
+  isLyricsOpen = $state(false);
+  hasModalOpen = $state(false);
 
   private notifTimer: number | null = null;
   private hwTimer: number | null = null;
@@ -28,7 +30,7 @@ class IslandStateStore {
     });
   }
 
-  // Hover triggered by mouse reaching top edge
+  // Hover triggered by mouse reaching island area
   async onMouseEnter() {
     if (this.leaveDebounceTimer) {
       clearTimeout(this.leaveDebounceTimer);
@@ -43,10 +45,33 @@ class IslandStateStore {
     }
   }
 
-  // Mouse left the island area -> smoothly slide back up to tucked
+  // Mouse left the island area
   async onMouseLeave() {
     this.isHovered = false;
 
+    if (this.leaveDebounceTimer) {
+      clearTimeout(this.leaveDebounceTimer);
+      this.leaveDebounceTimer = null;
+    }
+
+    // In expanded mode (Control Center or Music Card):
+    // Automatically close back to compact/tucked when cursor leaves!
+    // EXCEPTION: In Lyrics mode (isLyricsOpen), DO NOT auto-close per user requirement!
+    // EXCEPTION: While a modal is open (hasModalOpen), DO NOT auto-close!
+    if (this.mode === 'expanded') {
+      if (this.isLyricsOpen || this.hasModalOpen) {
+        return;
+      }
+
+      this.leaveDebounceTimer = window.setTimeout(async () => {
+        if (!this.isHovered && this.mode === 'expanded' && !this.isLyricsOpen && !this.hasModalOpen) {
+          await this.collapse();
+        }
+      }, 280);
+      return;
+    }
+
+    // In compact mode: smoothly slide back up to tucked notch
     if (this.mode === 'compact' && !this.activeNotification && !this.activeHardwareEvent && !this.hudType) {
       this.leaveDebounceTimer = window.setTimeout(async () => {
         if (!this.isHovered && this.mode === 'compact') {
@@ -64,6 +89,10 @@ class IslandStateStore {
   }
 
   async expand(subView: IslandSubView = 'auto') {
+    if (this.leaveDebounceTimer) {
+      clearTimeout(this.leaveDebounceTimer);
+      this.leaveDebounceTimer = null;
+    }
     this.mode = 'expanded';
     this.isRetracting = false;
     this.subView = subView;
@@ -71,8 +100,14 @@ class IslandStateStore {
   }
 
   async collapse() {
+    if (this.leaveDebounceTimer) {
+      clearTimeout(this.leaveDebounceTimer);
+      this.leaveDebounceTimer = null;
+    }
     this.subView = 'auto';
     this.hudType = null;
+    this.isLyricsOpen = false;
+    this.hasModalOpen = false;
     this.mode = 'compact';
     this.isRetracting = false;
     await tauriBridge.resizeIsland('compact');
@@ -101,17 +136,16 @@ class IslandStateStore {
   }
 
   async triggerNotification(payload: NotificationPayload) {
-    // Cancel any previous notification immediately
     if (this.notifTimer) clearTimeout(this.notifTimer);
     this.activeHardwareEvent = null;
     this.activeNotification = payload;
 
-    // Dismiss existing system popups (dunst) so they don't double up
     tauriBridge.dismissSystemNotifications();
 
-    // If currently tucked, drop down to compact so user can see it!
     if (this.mode === 'tucked') {
       this.mode = 'compact';
+      await tauriBridge.resizeIsland('compact', 440, 58);
+    } else if (this.mode === 'compact') {
       await tauriBridge.resizeIsland('compact', 440, 58);
     }
 
@@ -129,7 +163,6 @@ class IslandStateStore {
     this.activeNotification = null;
     this.activeHardwareEvent = payload;
 
-    // Drop down to show hardware status (e.g. Charging / USB)
     if (this.mode === 'tucked') {
       this.mode = 'compact';
       await tauriBridge.resizeIsland('compact');
@@ -143,7 +176,6 @@ class IslandStateStore {
       }
     }, 2800);
   }
-
 
   dismissNotification() {
     this.activeNotification = null;
