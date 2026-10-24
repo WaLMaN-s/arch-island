@@ -23,13 +23,18 @@ pub fn resize_island(window: Window, mode: String, custom_width: Option<f64>, cu
     let _ = window.set_position(Position::Logical(LogicalPosition { x, y }));
 
     // Instant i3wm floating repositioning & resizing (single command string)
+    let focus_cmd = if mode == "expanded" { ", focus" } else { "" };
     let i3_cmd = format!(
-        "[instance=\"arch-island\"] floating enable, border pixel 0, sticky enable, resize set {} {}, move position {} {}",
-        width as i32, height as i32, x as i32, y as i32
+        "[instance=\"arch-island\"] floating enable, border pixel 0, sticky enable, resize set {} {}, move position {} {}{}",
+        width as i32, height as i32, x as i32, y as i32, focus_cmd
     );
     let _ = std::process::Command::new("i3-msg")
         .arg(&i3_cmd)
         .spawn();
+
+    if mode == "expanded" {
+        let _ = window.set_focus();
+    }
 
     Ok(())
 }

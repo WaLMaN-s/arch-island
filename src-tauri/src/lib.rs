@@ -75,6 +75,8 @@ pub fn run() {
             commands::system::toggle_airplane_mode,
             commands::system::get_usb_drives,
             commands::system::open_file_manager,
+            commands::system::execute_power_action,
+            commands::system::send_desktop_notification,
             commands::audio::get_volume_state,
             commands::audio::set_volume,
             commands::audio::change_volume,

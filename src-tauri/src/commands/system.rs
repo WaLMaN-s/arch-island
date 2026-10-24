@@ -84,3 +84,45 @@ pub fn get_usb_drives() -> Vec<UsbDriveInfo> {
 pub fn open_file_manager(target_path: Option<String>) -> Result<(), String> {
     system_toggles::open_file_manager(target_path)
 }
+
+#[tauri::command]
+pub fn execute_power_action(action: String) -> Result<(), String> {
+    match action.as_str() {
+        "lock" => {
+            if Command::new("loginctl").args(["lock-session"]).spawn().is_err() {
+                let _ = Command::new("i3lock").spawn();
+            }
+        }
+        "suspend" => {
+            Command::new("systemctl")
+                .arg("suspend")
+                .spawn()
+                .map_err(|e| e.to_string())?;
+        }
+        "reboot" => {
+            Command::new("systemctl")
+                .arg("reboot")
+                .spawn()
+                .map_err(|e| e.to_string())?;
+        }
+        "shutdown" => {
+            Command::new("systemctl")
+                .arg("poweroff")
+                .spawn()
+                .map_err(|e| e.to_string())?;
+        }
+        _ => return Err("Invalid power action".into()),
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub fn send_desktop_notification(title: String, body: String, icon: Option<String>) -> Result<(), String> {
+    let mut cmd = Command::new("notify-send");
+    cmd.arg(&title).arg(&body);
+    if let Some(i) = icon {
+        cmd.arg("-i").arg(i);
+    }
+    let _ = cmd.spawn();
+    Ok(())
+}

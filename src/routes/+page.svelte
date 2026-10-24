@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { islandState } from '$lib/stores/islandState.svelte';
   import { systemStore } from '$lib/stores/systemStore.svelte';
+  import { reminderService } from '$lib/services/reminderService';
   import CompactIsland from '$lib/components/CompactIsland.svelte';
   import ExpandedIsland from '$lib/components/ExpandedIsland.svelte';
   import { listen } from '@tauri-apps/api/event';
@@ -9,6 +10,7 @@
   onMount(() => {
     systemStore.init();
     islandState.init();
+    reminderService.init();
 
     let unlistenClose: (() => void) | undefined;
     listen('close-requested', () => {
@@ -44,6 +46,7 @@
 
   onDestroy(() => {
     systemStore.destroy();
+    reminderService.destroy();
   });
 </script>
 

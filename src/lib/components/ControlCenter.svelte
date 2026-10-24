@@ -1450,26 +1450,28 @@
   }
 
   .notif-card {
-    background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 3px solid #38bdf8;
     border-radius: 10px;
     padding: 6px 9px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
     transition: all 0.2s ease;
   }
 
   .notif-card:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(56, 189, 248, 0.4);
   }
 
   .notif-card.whatsapp {
-    border-left: 2px solid #25D366;
+    border-left: 3px solid #22c55e;
   }
 
   .notif-card.firefox {
-    border-left: 2px solid #FF7139;
+    border-left: 3px solid #f97316;
   }
 
   .notif-card-header {
@@ -1485,35 +1487,40 @@
   }
 
   .app-dot {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: #7aa2f7;
+    background: #38bdf8;
+    box-shadow: 0 0 6px #38bdf8;
   }
 
   .notif-card.whatsapp .app-dot {
-    background: #25D366;
+    background: #22c55e;
+    box-shadow: 0 0 6px #22c55e;
   }
 
   .notif-card.firefox .app-dot {
-    background: #FF7139;
+    background: #f97316;
+    box-shadow: 0 0 6px #f97316;
   }
 
   .notif-app {
-    font-size: 9.5px;
-    font-weight: 700;
-    color: #c0caf5;
+    font-size: 10px;
+    font-weight: 800;
+    color: #38bdf8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
 
   .notif-time {
     font-size: 8.5px;
-    color: #565f89;
+    color: #94a3b8;
   }
 
   .notif-dismiss-btn {
     background: transparent;
     border: none;
-    color: #565f89;
+    color: #94a3b8;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -1524,7 +1531,7 @@
   }
 
   .notif-dismiss-btn:hover {
-    color: #f7768e;
+    color: #ef4444;
   }
 
   .notif-card-content {
@@ -1534,19 +1541,19 @@
   }
 
   .notif-summary {
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 700;
     color: #ffffff;
-    line-height: 1.2;
+    line-height: 1.25;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .notif-body {
-    font-size: 10px;
-    color: rgba(255, 255, 255, 0.7);
-    line-height: 1.25;
+    font-size: 10.5px;
+    color: #cbd5e1;
+    line-height: 1.3;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

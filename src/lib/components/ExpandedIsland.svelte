@@ -5,17 +5,25 @@
   import { tauriBridge } from '$lib/services/tauriBridge';
   import MusicCard from './MusicCard.svelte';
   import ControlCenter from './ControlCenter.svelte';
-  import { Disc, Sliders, X } from 'lucide-svelte';
+  import TodoList from './TodoList.svelte';
+  import CollegeSchedule from './CollegeSchedule.svelte';
+  import { Disc, Sliders, ListTodo, GraduationCap, Power, Lock, Moon, RotateCw, X } from 'lucide-svelte';
 
-  let currentTab = $state<'music' | 'controls'>(
+  let currentTab = $state<'music' | 'controls' | 'tasks' | 'kuliah'>(
     systemStore.media?.status === 'Playing' ? 'music' : 'controls'
   );
 
   let isLyricsMode = $state(false);
+  let showPowerMenu = $state(false);
+  let pendingPowerAction = $state<'lock' | 'suspend' | 'reboot' | 'shutdown' | null>(null);
 
-  function getTargetDimensions(tab: 'music' | 'controls', lyrics: boolean) {
+  function getTargetDimensions(tab: 'music' | 'controls' | 'tasks' | 'kuliah', lyrics: boolean) {
     if (tab === 'controls') {
       return { w: 430, h: 320 };
+    } else if (tab === 'tasks') {
+      return { w: 400, h: 330 };
+    } else if (tab === 'kuliah') {
+      return { w: 440, h: 350 };
     } else {
       if (lyrics) {
         return { w: 465, h: 360 };
@@ -33,13 +41,13 @@
   let cardWidth = $state(initialDims.w);
   let cardHeight = $state(initialDims.h);
 
-  function applyMorph(tab: 'music' | 'controls', lyrics: boolean) {
+  function applyMorph(tab: 'music' | 'controls' | 'tasks' | 'kuliah', lyrics: boolean) {
     const { w, h } = getTargetDimensions(tab, lyrics);
     cardWidth = w;
     cardHeight = h;
   }
 
-  function handleSelectTab(tab: 'music' | 'controls') {
+  function handleSelectTab(tab: 'music' | 'controls' | 'tasks' | 'kuliah') {
     if (currentTab === tab) {
       if (tab === 'music' && isLyricsMode) {
         handleLyricsToggle(false);
@@ -64,13 +72,56 @@
   function handleClose(e: MouseEvent) {
     e.stopPropagation();
     handleLyricsToggle(false);
+    showPowerMenu = false;
+    islandState.collapse();
+  }
+
+  async function triggerPower(action: 'lock' | 'suspend' | 'reboot' | 'shutdown') {
+    if (pendingPowerAction !== action) {
+      pendingPowerAction = action;
+      return;
+    }
+    // Confirmed second click
+    await tauriBridge.executePowerAction(action);
+    showPowerMenu = false;
+    pendingPowerAction = null;
     islandState.collapse();
   }
 
   onDestroy(() => {
     islandState.isLyricsOpen = false;
+    showPowerMenu = false;
   });
+
+  const TABS: ('controls' | 'music' | 'tasks' | 'kuliah')[] = ['controls', 'music', 'tasks', 'kuliah'];
+
+  function handleKeyDown(e: KeyboardEvent) {
+    if (islandState.mode !== 'expanded') return;
+
+    const target = e.target as HTMLElement | null;
+    if (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement ||
+      target instanceof HTMLSelectElement
+    ) {
+      return;
+    }
+
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      const idx = TABS.indexOf(currentTab);
+      const nextIdx = (idx + 1) % TABS.length;
+      handleSelectTab(TABS[nextIdx]);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const idx = TABS.indexOf(currentTab);
+      const prevIdx = (idx - 1 + TABS.length) % TABS.length;
+      handleSelectTab(TABS[prevIdx]);
+    }
+  }
 </script>
+
+<svelte:window onkeydown={handleKeyDown} />
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -104,9 +155,79 @@
           <span class="active-dot"></span>
         {/if}
       </button>
+
+      <button
+        class="tab-btn"
+        class:active={currentTab === 'tasks'}
+        onclick={() => handleSelectTab('tasks')}
+      >
+        <ListTodo size={13} />
+        <span>Tasks</span>
+      </button>
+
+      <button
+        class="tab-btn"
+        class:active={currentTab === 'kuliah'}
+        onclick={() => handleSelectTab('kuliah')}
+      >
+        <GraduationCap size={13} />
+        <span>Kuliah</span>
+      </button>
     </div>
 
     <div class="header-right">
+      <div class="power-menu-wrapper">
+        <button
+          class="power-btn"
+          class:active={showPowerMenu}
+          onclick={(e) => {
+            e.stopPropagation();
+            showPowerMenu = !showPowerMenu;
+            pendingPowerAction = null;
+          }}
+          title="Menu Daya (Power)"
+        >
+          <Power size={12} />
+        </button>
+
+        {#if showPowerMenu}
+          <div class="power-dropdown" onclick={(e) => e.stopPropagation()}>
+            <button
+              class="power-item"
+              class:confirm={pendingPowerAction === 'lock'}
+              onclick={() => triggerPower('lock')}
+            >
+              <Lock size={12} />
+              <span>{pendingPowerAction === 'lock' ? 'Yakin Kunci?' : 'Lock'}</span>
+            </button>
+            <button
+              class="power-item"
+              class:confirm={pendingPowerAction === 'suspend'}
+              onclick={() => triggerPower('suspend')}
+            >
+              <Moon size={12} />
+              <span>{pendingPowerAction === 'suspend' ? 'Yakin Sleep?' : 'Sleep'}</span>
+            </button>
+            <button
+              class="power-item"
+              class:confirm={pendingPowerAction === 'reboot'}
+              onclick={() => triggerPower('reboot')}
+            >
+              <RotateCw size={12} />
+              <span>{pendingPowerAction === 'reboot' ? 'Yakin Reboot?' : 'Reboot'}</span>
+            </button>
+            <button
+              class="power-item danger"
+              class:confirm={pendingPowerAction === 'shutdown'}
+              onclick={() => triggerPower('shutdown')}
+            >
+              <Power size={12} />
+              <span>{pendingPowerAction === 'shutdown' ? 'Yakin Matikan?' : 'Power Off'}</span>
+            </button>
+          </div>
+        {/if}
+      </div>
+
       <button class="close-btn" onclick={handleClose} title="Tutup Card">
         <X size={13} color="#94a3b8" />
       </button>
@@ -129,6 +250,22 @@
       class:inactive={currentTab !== 'controls'}
     >
       <ControlCenter />
+    </div>
+
+    <div
+      class="tab-pane"
+      class:active={currentTab === 'tasks'}
+      class:inactive={currentTab !== 'tasks'}
+    >
+      <TodoList />
+    </div>
+
+    <div
+      class="tab-pane"
+      class:active={currentTab === 'kuliah'}
+      class:inactive={currentTab !== 'kuliah'}
+    >
+      <CollegeSchedule />
     </div>
   </div>
 </div>
@@ -210,6 +347,79 @@
     display: flex;
     align-items: center;
     gap: 6px;
+  }
+
+  .power-menu-wrapper {
+    position: relative;
+  }
+
+  .power-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: all 0.2s ease;
+  }
+
+  .power-btn:hover,
+  .power-btn.active {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  .power-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 130px;
+    background: rgba(18, 20, 29, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+    z-index: 100;
+    backdrop-filter: blur(16px);
+  }
+
+  .power-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: #cbd5e1;
+    font-size: 11px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .power-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+  }
+
+  .power-item.danger:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+  }
+
+  .power-item.confirm {
+    background: rgba(239, 68, 68, 0.25);
+    color: #fca5a5;
+    font-weight: 600;
   }
 
   .close-btn {

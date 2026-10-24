@@ -260,6 +260,20 @@ export const tauriBridge = {
     await invoke('open_file_manager', { targetPath: targetPath || null });
   },
 
+  async executePowerAction(action: 'lock' | 'suspend' | 'reboot' | 'shutdown'): Promise<void> {
+    if (!isTauri()) return;
+    await invoke('execute_power_action', { action });
+  },
+
+  async sendDesktopNotification(title: string, body: string, icon?: string): Promise<void> {
+    if (!isTauri()) return;
+    try {
+      await invoke('send_desktop_notification', { title, body, icon: icon || null });
+    } catch (e) {
+      console.warn('sendDesktopNotification error:', e);
+    }
+  },
+
   async fetchLyrics(title: string, artist: string): Promise<{ syncedLyrics?: string; plainLyrics?: string } | null> {
     try {
       // Clean title and artist of extra tags like (Remastered), - Single, etc.
