@@ -92,11 +92,34 @@ fn get_audio_port() -> String {
     String::new()
 }
 
+fn get_active_external_displays() -> HashSet<String> {
+    let mut connected = HashSet::new();
+    if let Ok(entries) = fs::read_dir("/sys/class/drm") {
+        for entry in entries.flatten() {
+            let name = entry.file_name().to_string_lossy().to_string();
+            if name.contains("eDP") {
+                continue;
+            }
+            if name.starts_with("card") && (name.contains("HDMI") || name.contains("DP") || name.contains("VGA")) {
+                let status_path = entry.path().join("status");
+                if let Ok(status) = fs::read_to_string(status_path) {
+                    if status.trim() == "connected" {
+                        let clean_name = name.split('-').skip(1).collect::<Vec<_>>().join("-");
+                        connected.insert(clean_name);
+                    }
+                }
+            }
+        }
+    }
+    connected
+}
+
 pub fn start_hardware_monitor(app_handle: AppHandle) {
     thread::spawn(move || {
         let mut last_ac = read_ac_online();
         let mut last_usb = get_active_usb_devices();
         let mut last_audio_port = get_audio_port();
+        let mut last_displays = get_active_external_displays();
 
         // Initial delay to let the app start up cleanly
         thread::sleep(Duration::from_millis(1500));
@@ -194,6 +217,34 @@ pub fn start_hardware_monitor(app_handle: AppHandle) {
                 }
                 last_audio_port = current_audio_port;
             }
+
+            // 4. Check External Displays (HDMI / Projector)
+            let current_displays = get_active_external_displays();
+            for added in current_displays.difference(&last_displays) {
+                play_sound("device-added");
+                let payload = HardwareEventPayload {
+                    kind: "display".to_string(),
+                    status: "connected".to_string(),
+                    title: "Proyektor Terhubung".to_string(),
+                    subtitle: format!("{} • Tekan Mod+P untuk atur", added),
+                    icon: "monitor".to_string(),
+                    percentage: None,
+                };
+                let _ = app_handle.emit("hardware_event", payload);
+            }
+            for removed in last_displays.difference(&current_displays) {
+                play_sound("device-removed");
+                let payload = HardwareEventPayload {
+                    kind: "display".to_string(),
+                    status: "disconnected".to_string(),
+                    title: "Proyektor Dicabut".to_string(),
+                    subtitle: format!("{} terputus", removed),
+                    icon: "monitor".to_string(),
+                    percentage: None,
+                };
+                let _ = app_handle.emit("hardware_event", payload);
+            }
+            last_displays = current_displays;
         }
     });
 }

@@ -9,6 +9,7 @@
     BatteryLow,
     BatteryMedium,
     Headphones,
+    Monitor,
     Sun,
     Usb,
     Volume2,
@@ -44,6 +45,8 @@
           <Zap size={11} color="#10b981" fill="#10b981" />
         {:else if islandState.activeHardwareEvent.kind === 'usb'}
           <Usb size={11} color="#7aa2f7" />
+        {:else if islandState.activeHardwareEvent.kind === 'display'}
+          <Monitor size={11} color="#38bdf8" />
         {:else}
           <Headphones size={11} color="#bb9af7" />
         {/if}

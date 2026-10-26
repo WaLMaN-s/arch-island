@@ -3,122 +3,129 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Arch-dinamic — Living Notch & Control Center for Arch Linux</title>
-  <meta name="description" content="Arch-dinamic mengubah tepi atas layar Arch Linux + i3wm menjadi dynamic island modern untuk musik, lirik sinkron, task list, jadwal kuliah, dan kontrol sistem." />
+  <title>Arch-dinamic: a living notch for Arch Linux & i3wm</title>
+  <meta name="description" content="Arch-dinamic mengubah bilah atas layar Arch Linux menjadi dynamic island hidup untuk kontrol sistem, musik & lirik sinkron, task manager, dan jadwal kuliah." />
+  
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
   <style>
     :root {
-      --void: #05070d;
-      --card: rgba(16, 20, 31, 0.75);
+      color-scheme: dark;
+      --void: #03040a;
+      --panel: #0a0d18;
+      --card: rgba(16, 20, 31, 0.78);
       --card-border: rgba(255, 255, 255, 0.08);
-      --card-hover: rgba(23, 147, 209, 0.15);
+      --ink: #eceff7;
+      --mist: #8c94a8;
       --cyan: #1793d1;
       --cyan-bright: #38bdf8;
-      --indigo: #6366f1;
-      --purple: #a855f7;
+      --indigo: #2d5bff;
+      --violet: #7b4bff;
       --green: #4ade80;
-      --amber: #fbbf24;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --font: 'Plus Jakarta Sans', system-ui, sans-serif;
-      --mono: 'JetBrains Mono', monospace;
+      --amber: #f59e0b;
+      --glow: linear-gradient(90deg, var(--cyan), var(--indigo) 55%, var(--violet));
+      --font: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mono: "JetBrains Mono", monospace;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
-      background-color: var(--void);
-      color: var(--text);
+      margin: 0;
+      background: var(--void);
+      color: var(--ink);
       font-family: var(--font);
+      font-size: 17px;
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
-      background-image: 
-        radial-gradient(ellipse at 50% -20%, rgba(23, 147, 209, 0.25), transparent 70%),
-        radial-gradient(circle at 80% 30%, rgba(99, 102, 241, 0.08), transparent 50%);
+      background-image:
+        radial-gradient(ellipse at 50% -10%, rgba(23, 147, 209, 0.22), transparent 60%),
+        radial-gradient(circle at 80% 25%, rgba(45, 91, 255, 0.08), transparent 40%);
     }
 
-    .wrap {
-      width: min(1120px, 100% - 48px);
-      margin-inline: auto;
-    }
+    a { color: inherit; }
+    .wrap { width: min(1080px, 100% - 48px); margin-inline: auto; }
 
-    /* Navbar */
-    header {
+    /* Top bar & living mascot notch */
+    .bar {
       position: sticky;
       top: 0;
       z-index: 100;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--card-border);
-      background: rgba(5, 7, 13, 0.8);
-    }
-    .nav-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      height: 64px;
+      padding: 14px 28px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(3, 4, 10, 0.85);
+      border-bottom: 1px solid var(--card-border);
     }
     .brand {
       display: flex;
       align-items: center;
       gap: 10px;
       text-decoration: none;
-      color: var(--text);
       font-weight: 800;
-      font-size: 18px;
+      font-size: 19px;
+      letter-spacing: -0.02em;
     }
     .brand svg { width: 26px; height: 26px; }
     .brand span b { color: var(--cyan-bright); }
-    .nav-links {
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { text-decoration: none; color: var(--mist); font-size: 14.5px; font-weight: 600; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--ink); }
+
+    /* Living Mascot Notch atop the screen */
+    .mascot-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 28px;
+      background: #000;
+      border-radius: 0 0 16px 16px;
+      box-shadow: 0 4px 20px rgba(23, 147, 209, 0.4);
       display: flex;
-      gap: 24px;
       align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: none;
     }
-    .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      transition: color 0.2s;
+    .eyes { display: flex; gap: 14px; }
+    .eye {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 6px 1px rgba(56, 189, 248, 0.8);
+      animation: blink 4s infinite;
     }
-    .nav-links a:hover { color: var(--text); }
-    .btn-github-nav {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--card-border);
-      color: var(--text);
-      padding: 6px 14px;
-      border-radius: 99px;
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    .btn-github-nav:hover {
-      background: rgba(23, 147, 209, 0.15);
-      border-color: var(--cyan);
+    @keyframes blink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      95% { transform: scaleY(0.1); }
     }
 
     /* Hero */
     .hero {
       text-align: center;
-      padding: 70px 0 30px;
+      padding: 90px 0 30px;
     }
     .hero-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 5px 14px;
+      padding: 6px 16px;
       border-radius: 99px;
       background: rgba(23, 147, 209, 0.12);
       border: 1px solid rgba(56, 189, 248, 0.3);
       color: var(--cyan-bright);
-      font-size: 12.5px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
       margin-bottom: 24px;
     }
     .pulse-dot {
@@ -134,141 +141,112 @@
       50% { opacity: 0.4; transform: scale(0.85); }
     }
     .hero h1 {
-      font-size: clamp(38px, 6vw, 68px);
-      line-height: 1.05;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      max-width: 17ch;
       margin: 0 auto;
+      max-width: 14ch;
+      font-size: clamp(42px, 7vw, 84px);
+      line-height: 0.98;
+      font-weight: 800;
+      letter-spacing: -0.035em;
     }
     .gradient-text {
       background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .hero p {
-      margin: 20px auto 32px;
-      max-width: 580px;
-      color: var(--text-muted);
-      font-size: 17px;
-      line-height: 1.6;
+    .hero .lede {
+      margin: 24px auto 0;
+      max-width: 35em;
+      color: var(--mist);
+      font-size: 19px;
+      line-height: 1.55;
     }
-    .hero-actions {
+    .cta {
+      margin-top: 36px;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      flex-wrap: wrap;
       gap: 14px;
-      margin-bottom: 40px;
     }
-    .btn-primary {
+    .btn-download {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       background: linear-gradient(135deg, #1793d1 0%, #0284c7 100%);
       color: #fff;
+      font-size: 16px;
       font-weight: 700;
-      font-size: 15px;
-      padding: 13px 26px;
-      border-radius: 12px;
+      padding: 15px 32px;
+      border-radius: 14px;
       text-decoration: none;
-      box-shadow: 0 8px 24px rgba(23, 147, 209, 0.35);
+      box-shadow: 0 8px 30px rgba(23, 147, 209, 0.4);
       transition: all 0.2s ease;
     }
-    .btn-primary:hover {
+    .btn-download:hover {
       transform: translateY(-2px);
-      box-shadow: 0 12px 28px rgba(23, 147, 209, 0.5);
+      box-shadow: 0 12px 36px rgba(23, 147, 209, 0.6);
     }
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      color: var(--text);
-      font-weight: 600;
-      font-size: 14px;
-      padding: 13px 22px;
-      border-radius: 12px;
-      text-decoration: none;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s ease;
-    }
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    /* Interactive Live Island Simulator */
-    .mockup-section {
-      padding: 10px 0 60px;
-    }
-    .mockup-screen {
-      background: rgba(12, 16, 26, 0.9);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 16px 20px 30px;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
-      position: relative;
-      overflow: hidden;
-    }
-    .screen-header-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-bottom: 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      margin-bottom: 24px;
-    }
-    .dots {
-      display: flex;
-      gap: 6px;
-    }
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
-    .dot.r { background: #ef4444; }
-    .dot.y { background: #eab308; }
-    .dot.g { background: #22c55e; }
-    .screen-title {
-      font-size: 12px;
-      color: var(--text-muted);
+    .cta-sub {
+      font-size: 12.5px;
+      color: var(--mist);
       font-family: var(--mono);
     }
 
-    /* The Live Island Component */
-    .interactive-island-wrapper {
+    /* Interactive Live Island Simulator */
+    .mockup-container {
+      padding: 40px 0 70px;
+    }
+    .mockup-frame {
+      background: #090c16;
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      padding: 20px 24px 36px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      position: relative;
+    }
+    .frame-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 12px;
+      margin-bottom: 24px;
+    }
+    .frame-dots { display: flex; gap: 7px; }
+    .f-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .f-dot.r { background: #ef4444; }
+    .f-dot.y { background: #eab308; }
+    .f-dot.g { background: #22c55e; }
+    .frame-hint {
+      font-size: 12px;
+      color: var(--mist);
+      font-family: var(--mono);
+    }
+
+    /* The Interactive Island Card */
+    .island-center {
       display: flex;
       justify-content: center;
-      min-height: 280px;
-      perspective: 1000px;
     }
-    .live-island {
-      background: rgba(16, 18, 27, 0.95);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+    .interactive-card {
+      background: rgba(16, 18, 27, 0.96);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 20px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7);
       width: 440px;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 12px 16px 16px;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
-      padding: 12px 16px;
+      gap: 10px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .island-tabbar {
+    .card-topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
       padding-bottom: 8px;
-      margin-bottom: 12px;
     }
-    .tabs-pill {
+    .tab-pills {
       display: flex;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.06);
@@ -276,25 +254,26 @@
       padding: 2px;
       gap: 2px;
     }
-    .tab-btn {
-      padding: 4px 10px;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
+    .t-btn {
       background: transparent;
       border: none;
       border-radius: 99px;
+      color: var(--mist);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 5px;
-      transition: all 0.2s;
+      gap: 4px;
+      font-family: inherit;
+      transition: all 0.15s;
     }
-    .tab-btn.active {
+    .t-btn.active {
       background: rgba(23, 147, 209, 0.2);
       color: var(--cyan-bright);
     }
-    .power-btn {
+    .p-btn {
       width: 24px;
       height: 24px;
       border-radius: 50%;
@@ -303,262 +282,187 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--text-muted);
+      color: var(--mist);
       cursor: pointer;
     }
-    .power-btn:hover { color: #f87171; background: rgba(239, 68, 68, 0.15); }
+    .p-btn:hover { color: #f87171; background: rgba(239, 68, 68, 0.15); }
 
-    .island-pane {
-      display: none;
-      animation: fadeIn 0.2s ease-out;
-    }
-    .island-pane.active { display: block; }
+    .pane-view { display: none; }
+    .pane-view.active { display: block; animation: fadeIn 0.2s ease-out; }
 
     /* Control pane */
-    .mock-slider-row {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .mock-slider {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 11.5px;
-      color: var(--text-muted);
-    }
-    .mock-bar {
-      flex: 1;
-      height: 7px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 99px;
-      overflow: hidden;
-      position: relative;
-    }
-    .mock-fill {
-      height: 100%;
-      background: var(--cyan);
-      border-radius: 99px;
-    }
-    .mock-metrics {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .metric-card {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 8px;
-      padding: 8px;
-      font-size: 11px;
-    }
-    .metric-card b { display: block; color: #fff; font-size: 12px; }
+    .c-sliders { display: flex; flex-direction: column; gap: 8px; }
+    .c-slide { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--mist); }
+    .c-bar { flex: 1; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 99px; overflow: hidden; }
+    .c-fill { height: 100%; border-radius: 99px; }
+    .c-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+    .c-card { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 7px 10px; font-size: 11px; }
+    .c-card b { display: block; color: #fff; font-size: 11.5px; }
 
     /* Music pane */
-    .mock-music {
-      display: flex;
-      gap: 14px;
-      align-items: center;
-    }
-    .album-art {
-      width: 68px;
-      height: 68px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-      flex-shrink: 0;
-    }
-    .music-details { flex: 1; min-width: 0; }
-    .music-title { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .music-artist { font-size: 11px; color: var(--text-muted); }
-    .mock-controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 8px;
-    }
-    .ctrl-circle {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.08);
-      border: none;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    .ctrl-circle.play { background: var(--cyan); color: #fff; }
+    .m-wrap { display: flex; gap: 14px; align-items: center; }
+    .m-cover { width: 68px; height: 68px; border-radius: 10px; background: linear-gradient(135deg, #1e293b, #0f172a); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+    .m-info { flex: 1; min-width: 0; }
+    .m-title { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .m-artist { font-size: 11px; color: var(--mist); }
+    .m-ctrls { display: flex; gap: 10px; margin-top: 8px; }
+    .m-circle { width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .m-circle.play { background: var(--cyan); }
 
     /* Tasks pane */
-    .mock-tasks {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .mock-task-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 6px 10px;
-      border-radius: 7px;
-      font-size: 11.5px;
-    }
-    .mock-checkbox {
-      width: 15px;
-      height: 15px;
-      border-radius: 4px;
-      border: 1.5px solid rgba(255, 255, 255, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .mock-checkbox.checked {
-      background: #10b981;
-      border-color: #10b981;
-    }
-    .mock-task-text.done {
-      text-decoration: line-through;
-      text-decoration-color: var(--green);
-      color: var(--green);
-    }
-    .mock-task-text.pending { color: #f1f5f9; }
-    .pill-reminder {
-      margin-left: auto;
-      font-size: 9px;
-      color: var(--amber);
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 1px 5px;
-      border-radius: 4px;
-    }
+    .t-list { display: flex; flex-direction: column; gap: 6px; }
+    .t-item { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); padding: 7px 10px; border-radius: 7px; font-size: 11.5px; }
+    .t-box { width: 15px; height: 15px; border-radius: 4px; border: 1.5px solid rgba(255, 255, 255, 0.35); display: flex; align-items: center; justify-content: center; font-size: 10px; }
+    .t-box.done { background: #10b981; border-color: #10b981; color: #fff; }
+    .t-text.done { text-decoration: line-through; text-decoration-color: var(--green); color: var(--green); }
+    .t-text.pend { color: #f1f5f9; }
+    .t-remind { margin-left: auto; font-size: 9px; color: var(--amber); background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); padding: 1px 5px; border-radius: 4px; }
 
     /* Kuliah pane */
-    .mock-schedule {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-    .mock-class-card {
-      background: rgba(255, 255, 255, 0.04);
-      border-left: 3px solid var(--cyan);
-      border-radius: 0 8px 8px 0;
-      padding: 6px 10px;
-      font-size: 11.5px;
-    }
-    .mock-class-title { font-weight: 700; color: #fff; }
-    .mock-class-meta { display: flex; gap: 8px; font-size: 10.5px; color: var(--text-muted); margin-top: 3px; }
+    .k-list { display: flex; flex-direction: column; gap: 6px; }
+    .k-card { background: rgba(255, 255, 255, 0.04); border-left: 3px solid var(--cyan); border-radius: 0 8px 8px 0; padding: 7px 10px; font-size: 11.5px; }
+    .k-title { font-weight: 700; color: #fff; }
+    .k-meta { display: flex; gap: 8px; font-size: 10.5px; color: var(--mist); margin-top: 3px; }
 
-    /* Features Grid */
-    .sec-head {
-      text-align: center;
-      margin-bottom: 48px;
-    }
-    .sec-head h2 {
-      font-size: clamp(28px, 4vw, 42px);
+    /* Feature Sections */
+    .sec-title {
+      font-size: clamp(30px, 4.5vw, 48px);
+      line-height: 1.05;
       font-weight: 800;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
+      text-align: center;
     }
-    .sec-head p {
-      color: var(--text-muted);
-      margin-top: 10px;
-      font-size: 16px;
+    .sec-lede {
+      margin: 14px auto 48px;
+      max-width: 32em;
+      color: var(--mist);
+      text-align: center;
+      font-size: 17.5px;
     }
 
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 20px;
-      margin-bottom: 80px;
+      gap: 22px;
+      margin-bottom: 90px;
     }
-    .feature-card {
+    .f-card {
       background: var(--card);
       border: 1px solid var(--card-border);
-      border-radius: 18px;
-      padding: 26px;
+      border-radius: 20px;
+      padding: 28px;
       transition: all 0.25s ease;
       position: relative;
-      overflow: hidden;
     }
-    .feature-card:hover {
-      border-color: rgba(56, 189, 248, 0.3);
+    .f-card:hover {
+      border-color: rgba(56, 189, 248, 0.35);
       transform: translateY(-3px);
-      background: rgba(20, 26, 40, 0.85);
+      background: rgba(18, 24, 38, 0.9);
     }
-    .feature-icon {
-      width: 44px;
-      height: 44px;
+    .f-icon {
+      width: 46px;
+      height: 46px;
       border-radius: 12px;
       background: rgba(23, 147, 209, 0.15);
       border: 1px solid rgba(56, 189, 248, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 22px;
       margin-bottom: 18px;
     }
-    .feature-card h3 {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .feature-card p {
-      font-size: 14.5px;
-      color: var(--text-muted);
-      line-height: 1.55;
-    }
+    .f-card h3 { font-size: 19px; font-weight: 700; margin-bottom: 8px; }
+    .f-card p { font-size: 14.5px; color: var(--mist); line-height: 1.55; }
 
-    /* Terminal Quick Install */
-    .install-box {
-      background: #090c15;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Tech Specs / Light Section */
+    .light-section {
+      background: #060913;
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 90px;
+    }
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .spec-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 14px;
-      padding: 20px 24px;
-      max-width: 640px;
-      margin: 0 auto 80px;
+      padding: 20px;
+      text-align: center;
+    }
+    .spec-val { font-size: 32px; font-weight: 800; color: var(--cyan-bright); font-family: var(--mono); }
+    .spec-label { font-size: 13px; color: var(--mist); margin-top: 4px; }
+
+    /* Install terminal box */
+    .install-sec {
+      text-align: center;
+      margin-bottom: 90px;
+    }
+    .term-box {
+      background: #05070e;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 14px;
+      padding: 18px 24px;
+      max-width: 680px;
+      margin: 24px auto 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     }
-    .command-text {
-      font-family: var(--mono);
-      font-size: 13.5px;
-      color: var(--cyan-bright);
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-    .copy-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+    .term-cmd { font-family: var(--mono); font-size: 13.5px; color: var(--cyan-bright); white-space: nowrap; overflow-x: auto; }
+    .term-copy {
+      background: rgba(23, 147, 209, 0.2);
+      border: 1px solid rgba(56, 189, 248, 0.4);
       color: #fff;
-      padding: 6px 12px;
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 7px 14px;
       border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
       cursor: pointer;
       flex-shrink: 0;
+      font-family: inherit;
       transition: all 0.15s;
     }
-    .copy-btn:hover { background: var(--cyan); }
+    .term-copy:hover { background: var(--cyan); }
+
+    /* FAQ */
+    .faq-list {
+      max-width: 720px;
+      margin: 0 auto 90px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    details {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    details[open] { border-color: rgba(56, 189, 248, 0.35); }
+    summary { font-weight: 700; font-size: 16px; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+    summary::after { content: "+"; font-size: 20px; color: var(--cyan-bright); font-weight: 400; }
+    details[open] summary::after { content: "−"; }
+    details p { margin-top: 10px; font-size: 14.5px; color: var(--mist); line-height: 1.6; }
 
     /* Footer */
     footer {
       border-top: 1px solid var(--card-border);
       padding: 40px 0;
       text-align: center;
-      color: var(--text-muted);
-      font-size: 13.5px;
+      color: var(--mist);
+      font-size: 14px;
     }
-    footer a { color: var(--cyan-bright); text-decoration: none; }
+    footer a { color: var(--cyan-bright); text-decoration: none; font-weight: 600; }
     footer a:hover { text-decoration: underline; }
 
     @keyframes fadeIn {
@@ -569,154 +473,147 @@
 </head>
 <body>
 
-  <!-- Top Navigation -->
-  <header>
-    <div class="wrap nav-bar">
-      <a href="#" class="brand">
-        <!-- Arch Linux Logo SVG -->
-        <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M150 25L255 245C225 220 200 215 175 225C185 200 175 180 150 170C125 180 115 200 125 225C100 215 75 220 45 245L150 25Z" fill="#1793d1"/>
-        </svg>
-        <span>Arch-<b>dinamic</b></span>
-      </a>
-      <nav class="nav-links">
-        <a href="#features">Fitur</a>
-        <a href="#preview">Simulator</a>
-        <a href="#install">Instalasi</a>
-        <a href="https://github.com/WaLMaN-s/arch-island" target="_blank" class="btn-github-nav">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          <span>GitHub</span>
-        </a>
-      </nav>
+  <!-- Top bar with living mascot notch -->
+  <header class="bar">
+    <a href="#" class="brand">
+      <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M150 25L255 245C225 220 200 215 175 225C185 200 175 180 150 170C125 180 115 200 125 225C100 215 75 220 45 245L150 25Z" fill="#1793d1"/>
+      </svg>
+      <span>Arch-<b>dinamic</b></span>
+    </a>
+
+    <!-- Living Mascot Notch -->
+    <div class="mascot-notch" title="A living notch atop your screen">
+      <div class="eyes">
+        <span class="eye"></span>
+        <span class="eye"></span>
+      </div>
     </div>
+
+    <nav class="nav-links">
+      <a href="#features">Fitur</a>
+      <a href="#preview">Simulator</a>
+      <a href="#light">Spesifikasi</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/WaLMaN-s/arch-island" target="_blank" style="color: var(--cyan-bright);">GitHub ↗</a>
+    </nav>
   </header>
 
-  <!-- Hero Section -->
   <main>
+    <!-- Hero -->
     <section class="wrap hero">
       <div class="hero-badge">
         <span class="pulse-dot"></span>
-        <span>Dynamic Island & Control Center untuk Arch Linux + i3wm</span>
+        <span>A living notch for Arch Linux & i3wm</span>
       </div>
 
       <h1>The top of your screen, <span class="gradient-text">alive.</span></h1>
 
-      <p>
-        <b>Arch-dinamic</b> mengubah bilah atas layarmu menjadi notch hidup, responsif, dan hemat daya. Kendalikan pemutar musik, lirik sinkron, task list, jadwal kuliah, hingga kontrol sistem i3wm tanpa repot.
+      <p class="lede">
+        <b>Arch-dinamic</b> mengubah tepi atas layarmu menjadi notch hidup, responsif, dan hemat daya. Kendalikan pemutar musik, lirik tersinkronisasi, task list, jadwal kuliah, hingga kontrol sistem i3wm tanpa repot.
       </p>
 
-      <div class="hero-actions">
-        <!-- Download link to Repo as requested -->
-        <a href="https://github.com/WaLMaN-s/arch-island" target="_blank" class="btn-primary">
+      <div class="cta">
+        <!-- Direct download to repo -->
+        <a href="https://github.com/WaLMaN-s/arch-island" target="_blank" class="btn-download">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span>Download di GitHub</span>
+          <span>Get Arch-dinamic on GitHub</span>
         </a>
-        <a href="#preview" class="btn-secondary">
-          <span>Lihat Demo Interaktif</span>
-        </a>
+        <span class="cta-sub">Free • Open Source (MIT) • Built for Arch Linux & i3wm</span>
       </div>
     </section>
 
-    <!-- Interactive Live Simulator Section -->
-    <section id="preview" class="wrap mockup-section">
-      <div class="mockup-screen">
-        <div class="screen-header-bar">
-          <div class="dots">
-            <span class="dot r"></span>
-            <span class="dot y"></span>
-            <span class="dot g"></span>
+    <!-- Interactive Simulator -->
+    <section id="preview" class="wrap mockup-container">
+      <div class="mockup-frame">
+        <div class="frame-bar">
+          <div class="frame-dots">
+            <span class="f-dot r"></span>
+            <span class="f-dot y"></span>
+            <span class="f-dot g"></span>
           </div>
-          <span class="screen-title">arch-island: live-preview.sh (Klik tab di bawah untuk mencoba!)</span>
+          <span class="frame-hint">arch-dinamic: simulator (Gunakan tombol panah keyboard ← / → atau klik tab)</span>
           <div></div>
         </div>
 
-        <div class="interactive-island-wrapper">
-          <div class="live-island">
-            <!-- Header Tabs -->
-            <div class="island-tabbar">
-              <div class="tabs-pill">
-                <button class="tab-btn active" onclick="switchTab('controls')">🎚️ Control</button>
-                <button class="tab-btn" onclick="switchTab('music')">🎵 Music</button>
-                <button class="tab-btn" onclick="switchTab('tasks')">📝 Tasks</button>
-                <button class="tab-btn" onclick="switchTab('kuliah')">🎓 Kuliah</button>
+        <div class="island-center">
+          <div class="interactive-card">
+            <div class="card-topbar">
+              <div class="tab-pills">
+                <button class="t-btn active" onclick="setTab('controls')">🎚️ Control</button>
+                <button class="t-btn" onclick="setTab('music')">🎵 Music</button>
+                <button class="t-btn" onclick="setTab('tasks')">📝 Tasks</button>
+                <button class="t-btn" onclick="setTab('kuliah')">🎓 Kuliah</button>
               </div>
-              <button class="power-btn" title="Menu Daya (Power)">⏻</button>
+              <button class="p-btn" title="Power Menu">⏻</button>
             </div>
 
-            <!-- Tab 1: Controls -->
-            <div id="pane-controls" class="island-pane active">
-              <div class="mock-slider-row">
-                <div class="mock-slider">
-                  <span>Vol</span>
-                  <div class="mock-bar"><div class="mock-fill" style="width: 78%;"></div></div>
+            <!-- Controls Pane -->
+            <div id="pv-controls" class="pane-view active">
+              <div class="c-sliders">
+                <div class="c-slide">
+                  <span>Audio</span>
+                  <div class="c-bar"><div class="c-fill" style="width: 78%; background: var(--cyan);"></div></div>
                   <span>78%</span>
                 </div>
-                <div class="mock-slider">
+                <div class="c-slide">
                   <span>Mic</span>
-                  <div class="mock-bar"><div class="mock-fill" style="width: 60%; background: #a855f7;"></div></div>
+                  <div class="c-bar"><div class="c-fill" style="width: 60%; background: #a855f7;"></div></div>
                   <span>60%</span>
                 </div>
-                <div class="mock-slider">
-                  <span>Lux</span>
-                  <div class="mock-bar"><div class="mock-fill" style="width: 90%; background: #eab308;"></div></div>
+                <div class="c-slide">
+                  <span>Brightness</span>
+                  <div class="c-bar"><div class="c-fill" style="width: 90%; background: #eab308;"></div></div>
                   <span>90%</span>
                 </div>
               </div>
-              <div class="mock-metrics">
-                <div class="metric-card">📶 WiFi: <b>Arch-Network (88%)</b></div>
-                <div class="metric-card">⚡ Baterai: <b>96% (Charging 18W)</b></div>
+              <div class="c-metrics">
+                <div class="c-card">📶 WiFi: <b>Arch-WiFi (88%)</b></div>
+                <div class="c-card">⚡ Baterai: <b>96% (Charging 18W)</b></div>
               </div>
             </div>
 
-            <!-- Tab 2: Music -->
-            <div id="pane-music" class="island-pane">
-              <div class="mock-music">
-                <div class="album-art">🎧</div>
-                <div class="music-details">
-                  <div class="music-title">Midnight City</div>
-                  <div class="music-artist">M83 • Hurry Up, We're Dreaming</div>
-                  <div class="mock-controls">
-                    <button class="ctrl-circle">⏮</button>
-                    <button class="ctrl-circle play">⏸</button>
-                    <button class="ctrl-circle">⏭</button>
+            <!-- Music Pane -->
+            <div id="pv-music" class="pane-view">
+              <div class="m-wrap">
+                <div class="m-cover">🎧</div>
+                <div class="m-info">
+                  <div class="m-title">Midnight City</div>
+                  <div class="m-artist">M83 • Synced Lyrics Active</div>
+                  <div class="m-ctrls">
+                    <button class="m-circle">⏮</button>
+                    <button class="m-circle play">⏸</button>
+                    <button class="m-circle">⏭</button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Tab 3: Tasks -->
-            <div id="pane-tasks" class="island-pane">
-              <div class="mock-tasks">
-                <div class="mock-task-item">
-                  <div class="mock-checkbox checked">✓</div>
-                  <span class="mock-task-text done">Selesaikan laporan praktikum robotika</span>
+            <!-- Tasks Pane -->
+            <div id="pv-tasks" class="pane-view">
+              <div class="t-list">
+                <div class="t-item">
+                  <div class="t-box done">✓</div>
+                  <span class="t-text done">Laporan praktikum robotika cerdas</span>
                 </div>
-                <div class="mock-task-item">
-                  <div class="mock-checkbox"></div>
-                  <span class="mock-task-text pending">Revisi diagram SRS Sistem Informasi</span>
-                  <span class="pill-reminder">⏳ Belum Selesai</span>
+                <div class="t-item">
+                  <div class="t-box"></div>
+                  <span class="t-text pend">Revisi diagram SRS Sistem Informasi</span>
+                  <span class="t-remind">⏳ Belum Selesai</span>
                 </div>
               </div>
             </div>
 
-            <!-- Tab 4: Kuliah -->
-            <div id="pane-kuliah" class="island-pane">
-              <div class="mock-schedule">
-                <div class="mock-class-card">
-                  <div class="mock-class-title">Praktikum Robotika Cerdas</div>
-                  <div class="mock-class-meta">
-                    <span>⏱️ 07:30 - 09:30</span>
-                    <span>📍 link (Online)</span>
-                    <span>👤 TIM DOSEN</span>
-                  </div>
+            <!-- Kuliah Pane -->
+            <div id="pv-kuliah" class="pane-view">
+              <div class="k-list">
+                <div class="k-card">
+                  <div class="k-title">Praktikum Robotika Cerdas</div>
+                  <div class="k-meta"><span>⏱️ 07:30 - 09:30</span><span>📍 link (Online)</span><span>👤 TIM DOSEN</span></div>
                 </div>
-                <div class="mock-class-card" style="border-left-color: #a855f7;">
-                  <div class="mock-class-title">Pengelolaan Proyek Sistem Informasi</div>
-                  <div class="mock-class-meta">
-                    <span>⏱️ 08:30 - 12:30</span>
-                    <span>📍 Ruang G421</span>
-                    <span>👤 WIDYA SILFIANTI</span>
-                  </div>
+                <div class="k-card" style="border-left-color: #a855f7;">
+                  <div class="k-title">Pengelolaan Proyek Sistem Informasi</div>
+                  <div class="k-meta"><span>⏱️ 08:30 - 12:30</span><span>📍 Ruang G421</span><span>👤 WIDYA SILFIANTI</span></div>
                 </div>
               </div>
             </div>
@@ -726,62 +623,108 @@
       </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- Features -->
     <section id="features" class="wrap">
-      <div class="sec-head">
-        <h2>Semua yang kamu perlukan, di satu bilah.</h2>
-        <p>Dirancang khusus untuk pengguna Arch Linux dan i3wm tanpa mengorbankan performa sistem.</p>
-      </div>
+      <h2 class="sec-title">Everything you glance at, in one place.</h2>
+      <p class="sec-lede">Arahkan kursor ke tepi atas layar untuk membuka notch. Pindahkan mouse dan notch akan meluncur kembali ke persembunyiannya.</p>
 
       <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">🎛️</div>
+        <div class="f-card">
+          <div class="f-icon">🎛️</div>
           <h3>Control Center Lengkap</h3>
-          <p>Kendalikan WiFi, Bluetooth, slider audio, mic, kecerahan layar (`brightnessctl`), serta eject USB drive langsung dari bilah atas.</p>
+          <p>Kendalikan WiFi, Bluetooth, Microphone slider, Master Volume, Display Brightness (`brightnessctl`), dan eject USB drive langsung tanpa membuka terminal.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">🎵</div>
-          <h3>MPRIS Player & Synced Lyrics</h3>
-          <p>Terhubung otomatis ke Spotify, Firefox, MPV, atau VLC dengan lirik lagu sinkron (*timed LRC*) yang bergulir mengikuti detik lagu.</p>
+        <div class="f-card">
+          <div class="f-icon">🎵</div>
+          <h3>MPRIS & Synced Lyrics</h3>
+          <p>Deteksi otomatis pemutar musik sistem (Spotify, Firefox, MPV). Dilengkapi lirik lagu sinkron (*timed LRC*) yang auto-scroll mengikuti detik lagu.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">📝</div>
+        <div class="f-card">
+          <div class="f-icon">📝</div>
           <h3>TodoList & Pengingat 1 Jam</h3>
-          <p>Catat tugas cepat saat ngoding. Tugas selesai dicoret hijau dan sistem otomatis mengirim notifikasi pengingat setiap 1 jam jika ada tugas pending.</p>
+          <p>Scratchpad tugas cepat. Tugas selesai dicoret dengan warna hijau segar, dan sistem otomatis mengirimkan notifikasi desktop setiap 1 jam jika ada tugas pending.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">🎓</div>
+        <div class="f-card">
+          <div class="f-icon">🎓</div>
           <h3>Jadwal Kuliah & Notif H-1 Malam</h3>
-          <p>Kelola jadwal mata kuliah mingguan dengan pengingat otomatis di malam hari (pukul 20:00) agar kamu selalu siap menyambut kelas besok.</p>
+          <p>Daftar mata kuliah mingguan dengan pengingat otomatis di malam hari (pukul 20:00). Dilengkapi tombol tambah, ubah, dan hapus jadwal sesuai kebutuhan.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">⌨️</div>
-          <h3>Navigasi Keyboard Penuh</h3>
-          <p>Pindah menu dengan tombol panah keyboard (`←` dan `→`), terintegrasi mulus dengan layout tiling i3wm dan X11.</p>
+        <div class="f-card">
+          <div class="f-icon">⌨️</div>
+          <h3>Navigasi Keyboard Cepat</h3>
+          <p>Gunakan tombol panah keyboard (`←` dan `→`) untuk berpindah antar menu seketika. Terintegrasi mulus dengan alur kerja tiling window manager i3wm.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">⚡</div>
-          <h3>Ringan: Rust + Tauri + Svelte</h3>
-          <p>Dikompilasi menggunakan binary native Rust dan Svelte 5 runes. Mengonsumsi RAM di bawah 40MB dan CPU mendekati 0% saat diam.</p>
+        <div class="f-card">
+          <div class="f-icon">⏻</div>
+          <h3>Menu Daya Cepat (Power)</h3>
+          <p>Aksi cepat Lock Screen (`i3lock`), Suspend (`systemctl suspend`), Reboot, dan Shutdown dengan klik konfirmasi agar tidak terpencet tidak sengaja.</p>
         </div>
       </div>
     </section>
 
-    <!-- Quick Install Command -->
-    <section id="install" class="wrap">
-      <div class="sec-head">
-        <h2>Pasang di Arch Linux Kamu</h2>
-        <p>Jalankan satu baris perintah ini di terminal untuk langsung mengompilasi dan menjalankan.</p>
-      </div>
+    <!-- Tech Specs / Light Section -->
+    <section id="light" class="wrap light-section">
+      <h2 class="sec-title">So light, you'll forget it's there.</h2>
+      <p class="sec-lede">Dibangun secara native menggunakan binary Rust 2024, Tauri v2, dan Svelte 5 runes. Bukan Electron yang membebani memori.</p>
 
-      <div class="install-box">
-        <div class="command-text" id="cmd-text">git clone https://github.com/WaLMaN-s/arch-island.git && cd arch-island && npm run update</div>
-        <button class="copy-btn" onclick="copyInstallCmd()">Salin</button>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-val">&lt; 40 MB</div>
+          <div class="spec-label">Penggunaan RAM</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-val">0.0%</div>
+          <div class="spec-label">CPU Saat Tucked</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-val">0.3s</div>
+          <div class="spec-label">Animasi Morphing 3D</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-val">100%</div>
+          <div class="spec-label">Privasi (Offline-first)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Install Terminal Command -->
+    <section id="install" class="wrap install-sec">
+      <h2 class="sec-title">Pasang di Komputer Anda</h2>
+      <p class="sec-lede">Cukup satu perintah di terminal Arch Linux untuk mengunduh, mengompilasi, dan langsung menjalankannya.</p>
+
+      <div class="term-box">
+        <div class="term-cmd" id="install-cmd">git clone https://github.com/WaLMaN-s/arch-island.git && cd arch-island && npm run update</div>
+        <button class="term-copy" onclick="copyCmd()">Salin</button>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="wrap">
+      <h2 class="sec-title">Pertanyaan Umum (FAQ)</h2>
+      <p class="sec-lede">Beberapa hal yang sering ditanyakan mengenai Arch-dinamic.</p>
+
+      <div class="faq-list">
+        <details>
+          <summary>Apakah Arch-dinamic gratis dan open source?</summary>
+          <p>Ya! Arch-dinamic 100% gratis dan open source di bawah lisensi MIT. Source code lengkap tersedia di GitHub.</p>
+        </details>
+        <details>
+          <summary>Window manager apa saja yang didukung?</summary>
+          <p>Arch-dinamic dioptimalkan khusus untuk <b>i3wm</b> (X11) dengan Picom compositor. Jendela otomatis diset sticky, floating, dan berada di lapisan paling atas.</p>
+        </details>
+        <details>
+          <summary>Media player apa saja yang mendukung lirik sinkron?</summary>
+          <p>Semua pemutar media Linux yang mengekspos standar MPRIS di D-Bus: Spotify, Firefox, Google Chrome, MPV, VLC, Amberol, dan lainnya.</p>
+        </details>
+        <details>
+          <summary>Di mana tugas dan jadwal kuliah saya disimpan?</summary>
+          <p>Semuanya disimpan secara offline di komputer lokal Anda (melalui storage lokal webview Tauri). Tidak ada server eksternal, akun, atau pelacak analitik.</p>
+        </details>
       </div>
     </section>
   </main>
@@ -790,26 +733,44 @@
   <footer>
     <div class="wrap">
       <p>
-        <b>Arch-dinamic</b> — Open Source Project by <a href="https://github.com/WaLMaN-s" target="_blank">WaLMaN-s</a>.<br />
-        Source code tersedia di <a href="https://github.com/WaLMaN-s/arch-island" target="_blank">GitHub Repository</a>.
+        <b>Arch-dinamic</b> — Crafted for Arch Linux by <a href="https://github.com/WaLMaN-s" target="_blank">WaLMaN-s</a>.<br />
+        Download & Source Code di <a href="https://github.com/WaLMaN-s/arch-island" target="_blank">GitHub Repository</a>.
       </p>
     </div>
   </footer>
 
   <script>
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.island-pane').forEach(pane => pane.classList.remove('active'));
+    const TABS = ['controls', 'music', 'tasks', 'kuliah'];
+    let currentTabIdx = 0;
 
-      event.currentTarget.classList.add('active');
-      const activePane = document.getElementById('pane-' + tabName);
-      if (activePane) activePane.classList.add('active');
+    function setTab(tabName) {
+      document.querySelectorAll('.t-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.pane-view').forEach(p => p.classList.remove('active'));
+
+      const activeBtn = Array.from(document.querySelectorAll('.t-btn')).find(b => b.getAttribute('onclick').includes(tabName));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const targetPane = document.getElementById('pv-' + tabName);
+      if (targetPane) targetPane.classList.add('active');
+
+      currentTabIdx = TABS.indexOf(tabName);
     }
 
-    function copyInstallCmd() {
-      const text = document.getElementById('cmd-text').innerText;
+    // Keyboard arrow navigation on the web simulator
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        currentTabIdx = (currentTabIdx + 1) % TABS.length;
+        setTab(TABS[currentTabIdx]);
+      } else if (e.key === 'ArrowLeft') {
+        currentTabIdx = (currentTabIdx - 1 + TABS.length) % TABS.length;
+        setTab(TABS[currentTabIdx]);
+      }
+    });
+
+    function copyCmd() {
+      const text = document.getElementById('install-cmd').innerText;
       navigator.clipboard.writeText(text).then(() => {
-        const btn = document.querySelector('.copy-btn');
+        const btn = document.querySelector('.term-copy');
         btn.innerText = 'Tersalin! ✓';
         setTimeout(() => { btn.innerText = 'Salin'; }, 2000);
       });
