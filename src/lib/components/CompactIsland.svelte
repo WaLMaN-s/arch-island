@@ -20,6 +20,7 @@
   } from 'lucide-svelte';
 
   function handleClick() {
+    window.focus();
     islandState.toggle();
   }
 

@@ -88,35 +88,109 @@
     islandState.collapse();
   }
 
+  let controlTabBtn = $state<HTMLButtonElement | null>(null);
+  let cardElement = $state<HTMLElement | null>(null);
+
+  onMount(() => {
+    window.focus();
+    requestAnimationFrame(() => {
+      controlTabBtn?.focus();
+    });
+    setTimeout(() => {
+      controlTabBtn?.focus();
+    }, 50);
+  });
+
   onDestroy(() => {
     islandState.isLyricsOpen = false;
     showPowerMenu = false;
   });
 
   const TABS: ('controls' | 'music' | 'tasks' | 'kuliah')[] = ['controls', 'music', 'tasks', 'kuliah'];
+  const POWER_ACTIONS: ('lock' | 'suspend' | 'reboot' | 'shutdown')[] = ['lock', 'suspend', 'reboot', 'shutdown'];
+  let powerFocusIndex = $state<number>(0);
 
   function handleKeyDown(e: KeyboardEvent) {
     if (islandState.mode !== 'expanded') return;
 
     const target = e.target as HTMLElement | null;
+    // Don't hijack if typing in text/search/password inputs or textarea
     if (
-      target instanceof HTMLInputElement ||
-      target instanceof HTMLTextAreaElement ||
-      target instanceof HTMLSelectElement
+      (target instanceof HTMLInputElement && (target.type === 'text' || target.type === 'password' || target.type === 'search')) ||
+      target instanceof HTMLTextAreaElement
     ) {
       return;
     }
 
+    // Toggle Power menu with 'p' key
+    if ((e.key === 'p' || e.key === 'P') && !showPowerMenu) {
+      e.preventDefault();
+      showPowerMenu = true;
+      powerFocusIndex = 0;
+      pendingPowerAction = null;
+      return;
+    }
+
+    // Power Menu Keyboard Navigation: ArrowUp / ArrowDown / Enter / Escape
+    if (showPowerMenu) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        powerFocusIndex = (powerFocusIndex + 1) % POWER_ACTIONS.length;
+        pendingPowerAction = null;
+        return;
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        powerFocusIndex = (powerFocusIndex - 1 + POWER_ACTIONS.length) % POWER_ACTIONS.length;
+        pendingPowerAction = null;
+        return;
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        triggerPower(POWER_ACTIONS[powerFocusIndex]);
+        return;
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        showPowerMenu = false;
+        pendingPowerAction = null;
+        controlTabBtn?.focus();
+        return;
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        showPowerMenu = false;
+        pendingPowerAction = null;
+        handleSelectTab('kuliah');
+        return;
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        showPowerMenu = false;
+        pendingPowerAction = null;
+        handleSelectTab('controls');
+        return;
+      }
+    }
+
+    // Left and Right arrows: cycle tabs including Power menu
     if (e.key === 'ArrowRight') {
       e.preventDefault();
       const idx = TABS.indexOf(currentTab);
-      const nextIdx = (idx + 1) % TABS.length;
-      handleSelectTab(TABS[nextIdx]);
+      if (idx === TABS.length - 1) {
+        // Dari tab Kuliah, panah kanan lanjut membuka menu Power
+        showPowerMenu = true;
+        powerFocusIndex = 0;
+        pendingPowerAction = null;
+      } else {
+        handleSelectTab(TABS[idx + 1]);
+      }
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
       const idx = TABS.indexOf(currentTab);
-      const prevIdx = (idx - 1 + TABS.length) % TABS.length;
-      handleSelectTab(TABS[prevIdx]);
+      if (idx === 0) {
+        // Dari tab Control, panah kiri mundur membuka menu Power
+        showPowerMenu = true;
+        powerFocusIndex = 0;
+        pendingPowerAction = null;
+      } else {
+        handleSelectTab(TABS[idx - 1]);
+      }
     }
   }
 </script>
@@ -126,6 +200,8 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
+  bind:this={cardElement}
+  tabindex="-1"
   class="expanded-card"
   style="width: {cardWidth}px; height: {cardHeight}px;"
   onmouseenter={() => islandState.onMouseEnter()}
@@ -136,6 +212,7 @@
   <div class="card-header">
     <div class="tab-pill">
       <button
+        bind:this={controlTabBtn}
         class="tab-btn"
         class:active={currentTab === 'controls'}
         onclick={() => handleSelectTab('controls')}
@@ -183,6 +260,7 @@
           onclick={(e) => {
             e.stopPropagation();
             showPowerMenu = !showPowerMenu;
+            powerFocusIndex = 0;
             pendingPowerAction = null;
           }}
           title="Menu Daya (Power)"
@@ -194,32 +272,40 @@
           <div class="power-dropdown" onclick={(e) => e.stopPropagation()}>
             <button
               class="power-item"
+              class:focused={powerFocusIndex === 0}
               class:confirm={pendingPowerAction === 'lock'}
               onclick={() => triggerPower('lock')}
+              onmouseenter={() => (powerFocusIndex = 0)}
             >
               <Lock size={12} />
               <span>{pendingPowerAction === 'lock' ? 'Yakin Kunci?' : 'Lock'}</span>
             </button>
             <button
               class="power-item"
+              class:focused={powerFocusIndex === 1}
               class:confirm={pendingPowerAction === 'suspend'}
               onclick={() => triggerPower('suspend')}
+              onmouseenter={() => (powerFocusIndex = 1)}
             >
               <Moon size={12} />
               <span>{pendingPowerAction === 'suspend' ? 'Yakin Sleep?' : 'Sleep'}</span>
             </button>
             <button
               class="power-item"
+              class:focused={powerFocusIndex === 2}
               class:confirm={pendingPowerAction === 'reboot'}
               onclick={() => triggerPower('reboot')}
+              onmouseenter={() => (powerFocusIndex = 2)}
             >
               <RotateCw size={12} />
               <span>{pendingPowerAction === 'reboot' ? 'Yakin Reboot?' : 'Reboot'}</span>
             </button>
             <button
               class="power-item danger"
+              class:focused={powerFocusIndex === 3}
               class:confirm={pendingPowerAction === 'shutdown'}
               onclick={() => triggerPower('shutdown')}
+              onmouseenter={() => (powerFocusIndex = 3)}
             >
               <Power size={12} />
               <span>{pendingPowerAction === 'shutdown' ? 'Yakin Matikan?' : 'Power Off'}</span>
@@ -406,14 +492,18 @@
     transition: background 0.15s, color 0.15s;
   }
 
-  .power-item:hover {
-    background: rgba(255, 255, 255, 0.08);
+  .power-item:hover,
+  .power-item.focused {
+    background: rgba(255, 255, 255, 0.12);
     color: #ffffff;
+    outline: 1px solid rgba(56, 189, 248, 0.45);
   }
 
-  .power-item.danger:hover {
-    background: rgba(239, 68, 68, 0.15);
+  .power-item.danger:hover,
+  .power-item.danger.focused {
+    background: rgba(239, 68, 68, 0.2);
     color: #ef4444;
+    outline: 1px solid rgba(239, 68, 68, 0.5);
   }
 
   .power-item.confirm {
